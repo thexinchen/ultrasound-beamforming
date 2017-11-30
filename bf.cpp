@@ -47,9 +47,7 @@ void bf2(float*input, float *toff, float*out){
         for(int I = 0 ; I < Nchan; I++){
             float point = 0;
             float point_next = 0;
-            #pragma omp parallel for
             for(int i1 = 0 ; i1 < Nchan; i1++){
-                #pragma omp parallel for
                 for(int j1 = 0; j1 < Nsample; j1++){
                         // time us  
                     delay = ( sqrt(z_axis[j1]*z_axis[j1] + (x_axis[I] - x_axis[i1])*(x_axis[I] - x_axis[i1]) ) + z_axis[j1]) / soundv; // us 
@@ -59,24 +57,15 @@ void bf2(float*input, float *toff, float*out){
                         idx_floor = (idx);
                         point = input[frame*Nchan*Nsample + (i1*Nsample+idx_floor)];
                         point_next = input[frame*Nchan*Nsample + (i1*Nsample+idx_floor+1)];
-
-						if( fabs(x_axis[I] - x_axis[i1]) <= (z_axis[j1])/f_num ){
-
-							out[frame*Nchan*Nsample + I*Nsample + j1] += (point_next - point) * (idx - idx_floor) + point;
-						}else{
-							out[frame*Nchan*Nsample + I*Nsample + j1] += 0;
-						}
-                        
+			if( fabs(x_axis[I] - x_axis[i1]) <= (z_axis[j1])/f_num ){
+				out[frame*Nchan*Nsample + I*Nsample + j1] += (point_next - point) * (idx - idx_floor) + point;
+			}else{
+				out[frame*Nchan*Nsample + I*Nsample + j1] += 0;
+			}                      
                     }
-                }
-                    
+		}                    
             }
-
-
-        }
-        
-       
-        
+        }       
     }
     free(z_axis);
     free(x_axis);;
